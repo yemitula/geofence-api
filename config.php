@@ -2,10 +2,18 @@
 /**
  * Database configuration
  */
-define('DB_USERNAME', 'geofence_app');
-define('DB_PASSWORD', 'GEO$ql@1920');
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'geofence_app');
+
+//  local
+// define('DB_USERNAME', 'geofence_app');
+// define('DB_PASSWORD', 'GEO$ql@1920');
+// define('DB_HOST', 'localhost');
+// define('DB_NAME', 'geofence_app');
+
+// on heroku
+define('DB_USERNAME', 'b0dd12a4df6bf7');
+define('DB_PASSWORD', '1e799de1');
+define('DB_HOST', 'us-cdbr-east-02.cleardb.com');
+define('DB_NAME', 'heroku_a30f39b1170b714');
 
 /* Site URL Config */
 define('SITE_URL', 'https://www.alphalex.ng');
