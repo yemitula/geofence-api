@@ -1,7 +1,5 @@
 <?php
 //die('here');
-// error_reporting(0);
-// ini_set("display_errors", FALSE);
 date_default_timezone_set('Africa/Lagos');
 ini_set('log_errors',TRUE);
 ini_set('max_execution_time', 3600); //execution time in seconds
