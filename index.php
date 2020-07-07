@@ -4,7 +4,7 @@ date_default_timezone_set('Africa/Lagos');
 ini_set('log_errors',TRUE);
 ini_set('max_execution_time', 3600); //execution time in seconds
 
-error_reporting(E_ALL); ini_set("display_errors", TRUE);
+error_reporting(E_ALL ^ E_DEPRECATED); ini_set("display_errors", TRUE);
 // apc_clear_cache();
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
