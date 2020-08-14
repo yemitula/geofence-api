@@ -50,7 +50,7 @@ $app->get('/staff/:id', function($id) use ($app) {
     }
 });
 // edit staff
-$app->put('/staff', function($id) use ($app) {
+$app->put('/staff', function() use ($app) {
     // authAdmin();
     // initialize response array
     $response = [];
@@ -81,8 +81,8 @@ $app->put('/staff', function($id) use ($app) {
         // return resource
         if($update_staff>0) {
             // log admin action
-            $lg = new Logger();
-            $lg->logAction(" Updated a Staff");
+            // $lg = new Logger();
+            // $lg->logAction(" Updated a Staff");
             $response['status'] = "success";
             $response["message"] = "Staff udpated successfully!";
             echoResponse(200, $response);
@@ -240,9 +240,9 @@ $app->delete('/staff/:id', function($id) use ($app) {
     $staff_delete = $db->deleteFromTable("staff", "stf_id", $id);
     // deleted?
     if($staff_delete) {
-            // log admin action
-            $lg = new Logger();
-            $lg->logAction(" Deleted a Staff");
+        // log admin action
+        // $lg = new Logger();
+        // $lg->logAction(" Deleted a Staff");
     	$response['status'] = "success";
         $response["message"] =  "Staff deleted successfully";
         echoResponse(200, $response);
