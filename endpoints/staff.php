@@ -27,42 +27,72 @@ $app->get('/staff', function() use ($app) {
     }
 });
 // single staff
-// $app->get('/resources/:id', function($id) use ($app) {
-//     // authAdmin();
-//     // initialize response array
-//     $response = [];
-//     // database handler
-//     $db = new DbHandler();
-//     // compose sql query
-//     $query = "SELECT *,
-//         (SELECT COUNT(*) FROM customer_resource WHERE cr_resource_id = rsc_id) AS rsc_like_count 
-//         FROM resource LEFT JOIN resource_category ON rsc_category_id=rcat_id WHERE rsc_id = '$id' ";
-//     // run query
-//     $resource = $db->getOneRecord($query);
-//     // return resource
-//     if($resource) {
-//         $resource_faqs = $db->getRecordset("SELECT * FROM resource_faq WHERE rfaq_resource_id='$resource[rsc_id]' ");
-//         // determine if viewing customer likes resource
-//         $cust_id = $db->purify($app->request->get('customer'));
-//         $resource['rsc_is_liked'] = '0';
-//         if($cust_id) {
-//             $liked = $db->getOneRecord("SELECT COUNT(*) AS like_count FROM customer_resource WHERE cr_customer_id = '$cust_id' AND cr_resource_id = '$id'");
-//             if($liked && $liked['like_count'] > 0) {
-//                 $resource['rsc_is_liked'] = '1';
-//             }
-
-//         }
-//         $response['resource'] = $resource;
-//         $response['resource_faqs'] = $resource_faqs;
-//     	$response['status'] = "success";
-//         $response["message"] =  " Resource found!";
-//         echoResponse(200, $response);
-//     } else {
-//     	$response['status'] = "error";
-//         $response["message"] = "Resource not found!";
-//         echoResponse(201, $response);
-//     }
-// });
+$app->get('/staff/:id', function($id) use ($app) {
+    // authAdmin();
+    // initialize response array
+    $response = [];
+    // database handler
+    $db = new DbHandler();
+    // compose sql query
+    $query = "SELECT * FROM staff WHERE stf_id = '$id' ";
+    // run query
+    $staff = $db->getOneRecord($query);
+    // return staff
+    if($staff) {
+    	$response['staff'] = $staff;
+    	$response['status'] = "success";
+        $response["message"] =  " Staff found!";
+        echoResponse(200, $response);
+    } else {
+    	$response['status'] = "error";
+        $response["message"] = "Staff not found!";
+        echoResponse(201, $response);
+    }
+});
+// edit staff
+$app->put('/staff', function() use ($app) {
+    // authAdmin();
+    // initialize response array
+    $response = [];
+    $r = json_decode($app->request->getBody());
+    verifyRequiredParams(['id','no','name','email','password','loc_id'],$r->staff);
+    // database handler
+    $db = new DbHandler();// compose sql query
+    $stf_id = $db->purify($r->staff->id);
+    $stf_no = $db->purify($r->staff->no);
+    $stf_name = $db->purify($r->staff->name);
+    $stf_email = $db->purify($r->staff->email);
+    $stf_password = $db->purify($r->staff->password);
+    $stf_location_id = $db->purify($r->staff->loc_id);
+    // check if stf_no or stf_email is already added
+    $stf_check  = $db->getOneRecord("SELECT stf_id FROM staff WHERE (stf_no = '$stf_no' OR stf_email='$stf_email' ) AND stf_id<>$stf_id");
+    if($stf_check) {
+        // staff already exists
+        $response['status'] = "error";
+        $response["message"] = "Staff with Number or Email already Exists!";
+        echoResponse(201, $response);
+    }else {
+         //update staff
+         $update_staff = $db->updateInTable(
+        	"staff", /*table*/
+        	[ 'stf_no'=>$stf_no, 'stf_name' => $stf_name, 'stf_email' => $stf_email, 'stf_password' => $stf_password, 'stf_location_id' => $stf_location_id ], /*columns*/
+        	[ 'stf_id'=>$stf_id ] /*where clause*/
+        );
+        // return resource
+        if($update_staff>0) {
+            // log admin action
+            // $lg = new Logger();
+            // $lg->logAction(" Updated a Staff");
+            $response['status'] = "success";
+            $response["message"] = "Staff udpated successfully!";
+            echoResponse(200, $response);
+        } else {
+            $response['status'] = "error";
+            $response["message"] = "Something went wrong while trying to update the staff!";
+            echoResponse(201, $response);
+        }
+    }
+});
 // create staff
 $app->post('/staff', function() use ($app) {
     // initialize response array
@@ -82,7 +112,6 @@ $app->post('/staff', function() use ($app) {
     //generate safety code
     $pg = new PasswordGenerator();
     $stf_safety_code = $pg->randomNumericCode();
-    // var_dump("I AM HERE",$r->staff);die;
         
         // check if stf_no or stf_email is already added
         $stf_check  = $db->getOneRecord("SELECT stf_id FROM staff WHERE stf_no = '$stf_no' OR stf_email='$stf_email' ");
@@ -200,88 +229,26 @@ $app->get('/geofences', function() use ($app) {
     }
 });
 
-// edit resource
-$app->put('/resources', function() use ($app) {
+// delete staff
+$app->delete('/staff/:id', function($id) use ($app) {
     // only super admins allowed
-    authAdmin();
-    // initialize response array
-    $response = [];
-    // extract post body
-    $r = json_decode($app->request->getBody());
-    // check required fields
-    verifyRequiredParams(['rsc_id', 'rsc_title','rsc_category_id','rsc_type','rsc_keywords'],$r->resource);
-    // instantiate classes
-    $db = new DbHandler();
-    
-    $rsc_id = $db->purify($r->resource->rsc_id);
-    $rsc_title = $db->purify($r->resource->rsc_title);
-    $rsc_category_id = $db->purify($r->resource->rsc_category_id);
-    $rsc_type = $db->purify($r->resource->rsc_type);
-    $rsc_keywords = $db->purify($r->resource->rsc_keywords);
-    $rsc_image =  isset($r->resource->rsc_image) ? $db->purify($r->resource->rsc_image) : '';
-    $rsc_content =  isset($r->resource->rsc_content) ? $db->purify($r->resource->rsc_content) : '';
-    // check if rsc_title is already used with same category
-    $rsc_check  = $db->getOneRecord("SELECT rsc_id FROM resource WHERE rsc_title = '$rsc_title' AND rsc_category_id='$rsc_category_id' AND rsc_id <> '$rsc_id' ");
-    if($rsc_check) {
-        // another resource already exists
-        $response['status'] = "error";
-        $response["message"] = "Another Resource with same name already Exists for this category!";
-        echoResponse(201, $response);
-    } else {
-        //update update_resource
-        $update_resource = $db->updateInTable(
-        	"resource", /*table*/
-        	[ 'rsc_title' => $rsc_title, 'rsc_category_id' => $rsc_category_id,'rsc_type' => $rsc_type, 'rsc_keywords' => $rsc_keywords,'rsc_content' => $rsc_content, 'rsc_image' => $rsc_image], /*columns*/
-        	[ 'rsc_id'=>$rsc_id ] /*where clause*/
-        );
-        // resource updated successfully?
-        if($update_resource >= 0) {
-            if($rsc_type=='FAQ'){
-                // delete all previous faqs aand readd
-                $faqs_delete = $db->deleteFromTable("resource_faq", "rfaq_resource_id", $rsc_id);
-                $faqs =$r->faqs;
-                foreach ($faqs as $faq) {
-                    // var_dump("faq=",$faq->rfaq_answer); die;
-                    $apt = $db->insertToTable(
-                        [$rsc_id, $faq->rfaq_question, $faq->rfaq_answer], /*values - array*/
-                        ['rfaq_resource_id','rfaq_question','rfaq_answer'], /*column names - array*/
-                        "resource_faq" /*table name - string*/
-                        );
-                }
-            }
-            // log admin action
-            $lg = new Logger();
-            $lg->logAction(" Updates a Resource");
-            $response['status'] = "success";
-            $response["message"] = "Resource udpated successfully!";
-            echoResponse(200, $response);
-        } else {
-            $response['status'] = "error";
-            $response["message"] = "Something went wrong while trying to update the Resource!";
-            echoResponse(201, $response);
-        }
-    }
-});
-// delete resource
-$app->delete('/resources/:id', function($id) use ($app) {
-    // only super admins allowed
-    authAdmin();
+    // authAdmin();
     // initialize response array
     $response = [];
     // database handler
     $db = new DbHandler();
-    $resource_delete = $db->deleteFromTable("resource", "rsc_id", $id);
+    $staff_delete = $db->deleteFromTable("staff", "stf_id", $id);
     // deleted?
-    if($resource_delete) {
-            // log admin action
-            $lg = new Logger();
-            $lg->logAction(" Deleted a Resource");
+    if($staff_delete) {
+        // log admin action
+        // $lg = new Logger();
+        // $lg->logAction(" Deleted a Staff");
     	$response['status'] = "success";
-        $response["message"] =  "Resource deleted successfully";
+        $response["message"] =  "Staff deleted successfully";
         echoResponse(200, $response);
     } else {
     	$response['status'] = "error";
-        $response["message"] = "Resource DELETE failed!";
+        $response["message"] = "Staff DELETE failed!";
         echoResponse(201, $response);
     }
 });
