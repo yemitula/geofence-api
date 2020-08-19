@@ -123,13 +123,13 @@ $app->put('/staff/:staffId', function($staffId) use ($app) {
              'stf_no' => $stf_no,
              'stf_time_updated' => date("Y-m-d H:i:s")
          ];
-         if($stf_safety_code) {
+         if(isset($r->staff->stf_safety_code)) {
              $fieldsToUdpate['stf_safety_code'] = $stf_safety_code;
          }
-         if($stf_location_id) {
+         if(isset($r->staff->stf_location_id)) {
              $fieldsToUdpate['stf_location_id'] = $stf_location_id;
          }
-         if($stf_device_id) {
+         if(isset($r->staff->stf_device_id)) {
              $fieldsToUdpate['stf_device_id'] = $stf_device_id;
          }
          $update_staff = $db->updateInTable(
