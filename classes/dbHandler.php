@@ -132,7 +132,7 @@ class DbHandler {
         //run update query
         $query = "UPDATE `$table` SET $c WHERE 1=1 ".$w;
         //return ($query);
-        $r = $this->conn->query($query); //or die($this->conn->error.__LINE__);
+        $r = $this->conn->query($query) or die($this->conn->error.__LINE__);
 
         if ($r) {
             //u can try to get affected rows, not so necessary

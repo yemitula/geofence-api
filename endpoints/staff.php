@@ -93,6 +93,65 @@ $app->put('/staff', function() use ($app) {
         }
     }
 });
+// update staff
+$app->put('/staff/:staffId', function($staffId) use ($app) {
+    // authAdmin();
+    // initialize response array
+    $response = [];
+    $r = json_decode($app->request->getBody());
+    verifyRequiredParams(['stf_name','stf_email','stf_no'],$r->staff);
+    // database handler
+    $db = new DbHandler();// compose sql query
+    $stf_name = $db->purify($r->staff->stf_name);
+    $stf_email = $db->purify($r->staff->stf_email);
+    $stf_no = $db->purify($r->staff->stf_no);
+    $stf_safety_code = isset($r->staff->stf_safety_code) ? $db->purify($r->staff->stf_safety_code) : null;
+    $stf_location_id = isset($r->staff->stf_location_id) ? $db->purify($r->staff->stf_location_id) : null;
+    $stf_device_id = isset($r->staff->stf_device_id) ? $db->purify($r->staff->stf_device_id) : null;
+    // check if stf_no or stf_email is already added
+    $stf_check  = $db->getOneRecord("SELECT stf_id FROM staff WHERE (stf_no = '$stf_no' OR stf_email='$stf_email' ) AND stf_id<>$staffId");
+    if($stf_check) {
+        // staff already exists
+        $response['status'] = "error";
+        $response["message"] = "Another Staff with Number or Email already Exists!";
+        echoResponse(201, $response);
+    }else {
+         //update staff
+         $fieldsToUdpate = [
+             'stf_name' => $stf_name,
+             'stf_email' => $stf_email,
+             'stf_no' => $stf_no,
+             'stf_time_updated' => date("Y-m-d H:i:s")
+         ];
+         if($stf_safety_code) {
+             $fieldsToUdpate['stf_safety_code'] = $stf_safety_code;
+         }
+         if($stf_location_id) {
+             $fieldsToUdpate['stf_location_id'] = $stf_location_id;
+         }
+         if($stf_device_id) {
+             $fieldsToUdpate['stf_device_id'] = $stf_device_id;
+         }
+         $update_staff = $db->updateInTable(
+        	"staff", /*table*/
+        	$fieldsToUdpate,
+        	[ 'stf_id'=>$staffId ] /*where clause*/
+        );
+        // return resource
+        if($update_staff > 0) {
+            // log admin action
+            // $lg = new Logger();
+            // $lg->logAction(" Updated a Staff");
+            $response['status'] = "success";
+            $response["message"] = "Staff updated successfully!";
+            echoResponse(200, $response);
+        } else {
+            $response['status'] = "error";
+            $response["message"] = "Something went wrong while trying to update the staff!";
+            echoResponse(201, $response);
+        }
+    }
+});
 // create staff
 $app->post('/staff', function() use ($app) {
     // initialize response array
