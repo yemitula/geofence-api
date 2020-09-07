@@ -4,10 +4,16 @@
  */
 
 //  local
-define('DB_USERNAME', 'geofence_app');
+// define('DB_USERNAME', 'geofence_app');
+// define('DB_PASSWORD', 'GEO$ql@1920');
+// define('DB_HOST', 'localhost');
+// define('DB_NAME', 'geofence_app');
+
+//  tulabyte.net/geofence
+define('DB_USERNAME', 'tulaborm_geofenc');
 define('DB_PASSWORD', 'GEO$ql@1920');
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'geofence_app');
+define('DB_NAME', 'tulaborm_geofence');
 
 // on heroku
 // define('DB_USERNAME', 'b0dd12a4df6bf7');
@@ -16,14 +22,14 @@ define('DB_NAME', 'geofence_app');
 // define('DB_NAME', 'heroku_a30f39b1170b714');
 
 /* Site URL Config */
-define('SITE_URL', 'https://www.alphalex.ng');
+define('SITE_URL', 'https://tulabyte.net/geofence');
 
 /* Mobile URL */
 define('APP_URL', 'https://play.google.com/store');
 
 /* Brand ID */
-define('SHORTNAME', 'ALPhalex');
-define('LONGNAME', 'ALPhalex Business and Legal Tool');
+define('SHORTNAME', 'Geofence');
+define('LONGNAME', 'Geofence App for Seun Ogunfeitimi');
 
 /*Site Email*/
 define('FROM_EMAIL', 'app@alphalex.com.ng');
