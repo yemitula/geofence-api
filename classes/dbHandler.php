@@ -110,6 +110,37 @@ class DbHandler {
             return NULL;
         }
     }
+    /**
+     * Creating new record using columns array (key-value pairs) (like edit)
+     */
+    public function insertColumnsToTable($table, $columnsArray) {
+
+        $columns = '';
+        $values = '';
+        //loop thru columns array
+        foreach ($columnsArray as $column => $value) {
+            $columns .= "`".$column . "`,";
+            if($value === 0 || $value === 0.00) {
+                $values .= "0,";
+            } else {
+                if($value == '') {
+                    $values .= "NULL,";
+                } else {
+                    $values .= "'".$value."',";
+                }
+            }
+        }
+
+        $query = "INSERT INTO `".$table."` (".trim($columns,',').") VALUES(".trim($values,',').")";
+        // die($query);
+        $r = $this->conn->query($query) or die($this->conn->error.__LINE__);
+
+        if ($r) {
+            return $this->conn->insert_id;
+            } else {
+            return NULL;
+        }
+    }
     /*function updates a set of columns in a table using a where condition*/
     public function updateInTable($table, $columnsArray, $where){ 
         $a = array();
