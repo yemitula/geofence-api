@@ -12,7 +12,7 @@ class OneSignal {
 			);
 
     	switch ($apptype) {
-    		case 'customer':
+    		case 'admin':
     		case 'provider':
     		case 'manager':
     			$title = "Call2Fix Customer";

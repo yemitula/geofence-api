@@ -36,6 +36,7 @@ define('FROM_EMAIL', 'app@alphalex.com.ng');
 
 /*Admin Email*/
 define('ADMIN_EMAIL', 'yemitula@gmail.com');
+define('HELPDESK_EMAIL', 'ruth@tulabyte.net');
 
 /* NORMAL LOCALHOST SMTP */
 /*Server SMTP Access*/
