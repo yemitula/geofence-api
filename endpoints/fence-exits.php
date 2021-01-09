@@ -49,6 +49,9 @@ $app->post('/exits', function() use ($app) {
         'fex_is_safe' => $exit->fex_is_safe
     ]);
     if($fex_id) {
+        //notify admin
+        $nh = new NotificationHandler();
+        $noti_id = $nh->log('admin', $fex_id, "Staff Exited Fence");
         // insert done
         $response['fex_id'] = $fex_id;
         $response['status'] = "success";
@@ -57,6 +60,30 @@ $app->post('/exits', function() use ($app) {
     } else {
         $response['status'] = "error";
         $response["message"] = "Exit record failed!";
+        echoResponse(201, $response);
+    }
+});
+
+// single exit
+$app->get('/exits/:id', function($id) use ($app) {
+    // authAdmin();
+    // initialize response array
+    $response = [];
+    // database handler
+    $db = new DbHandler();
+    // compose sql query
+    $query = "SELECT * FROM fence_exit LEFT JOIN staff ON fex_staff_id=stf_id LEFT JOIN `location` ON fex_location_id=loc_id WHERE fex_id = '$id'";
+    // run query
+    $exit = $db->getOneRecord($query);
+    // return exit
+    if($exit) {
+    	$response['exit'] = $exit;
+    	$response['status'] = "success";
+        $response["message"] =  " Exit found!";
+        echoResponse(200, $response);
+    } else {
+    	$response['status'] = "error";
+        $response["message"] = "Exit not found!";
         echoResponse(201, $response);
     }
 });

@@ -21,7 +21,7 @@ class NotificationHandler {
             {
                 $en_id = $this->db->insertToTable(
                     [ $id, $message, $now ],
-                    [ 'en_staff_id', 'en_message', 'en_time' ],
+                    [ 'en_fence_exit_id', 'en_message', 'en_time' ],
                     'exit_notification'
                 );
                 return $en_id;
@@ -37,7 +37,7 @@ class NotificationHandler {
                 $read_count = $this->db->updateInTable(
                     "exit_notification",
                     [ 'en_read'=>"1" ],
-                    [ 'en_staff_id'=>$id ]
+                    [ 'en_fence_exit_id'=>$id ]
                 );
             }
             break;

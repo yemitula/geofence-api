@@ -95,63 +95,63 @@ $app->get('/checkExpiringRequests', function() use ($app) {
 });
 
 // check for exits requests, update the status and send notifications
-$app->get('/checkFenceExits', function() use ($app) {
-	$response = array();
-    $db = new DbHandler();
-    $lg = new Logger();
+// $app->get('/checkFenceExits', function() use ($app) {
+// 	$response = array();
+//     $db = new DbHandler();
+//     $lg = new Logger();
 
-    $lg->logToFile('fence-exits', '--- BEGIN - Checking for unsafe fence exits...');
+//     $lg->logToFile('fence-exits', '--- BEGIN - Checking for unsafe fence exits...');
 
-    // get all unsafe fence exits, greater than 5minutes in which wrong code was supplied and is not safe
+//     // get all unsafe fence exits, greater than 5minutes in which wrong code was supplied and is not safe
 
-    $query = "SELECT *, DATEDIFF(CURDATE(), fex_time_exited) AS fex_days FROM fence_exit
-	    LEFT JOIN staff ON fex_staff_id = stf_id
-	    LEFT JOIN `location` ON fex_location_id = loc_id
-	    WHERE fex_code_expected != fex_code_supplied
-		AND fex_is_safe=0
-	    AND DATEDIFF(CURDATE(), fex_time_exited) >= 5 ";
+//     $query = "SELECT *, DATEDIFF(CURDATE(), fex_time_exited) AS fex_days FROM fence_exit
+// 	    LEFT JOIN staff ON fex_staff_id = stf_id
+// 	    LEFT JOIN `location` ON fex_location_id = loc_id
+// 	    WHERE fex_code_expected != fex_code_supplied
+// 		AND fex_is_safe=0
+// 	    AND DATEDIFF(CURDATE(), fex_time_exited) >= 5 ";
 
-    $exits = $db->getRecordset($query);
+//     $exits = $db->getRecordset($query);
 
-    if($exits) {
-    	$lg->logToFile('fence-exits', "Found ".count($exits)." fence exit(s)");
-    	$os = new OneSignal();
-    	$sm = new mySwiftMailer();
-    	$nh = new NotificationHandler();
-        foreach ($exits as $exit) {
-        	// set req_state to Overdue
-        	// if($exit['req_state'] != 'Overdue' && $req_state['req_days'] > 30) {
-        	// 	$udpate_request = $db->updateInTable(
-		    //         "request", /*table*/
-		    //         [ 'req_state'=>'Overdue' ], /*columns*/
-		    //         [ 'req_id'=>$request['req_id'] ] /*where clause*/
-		    //     );
-        	// }
-	        // notifications
-	        $SHORTNAME = SHORTNAME;
-	        // helpdesk
-	        $subject = "ALERT! Staff {$exit['stf_name']} has exited their location!";
-	        $body = "<p>Hello Admin,</p>
-	        <p>
-	        <p>Staff #{$exit['stf_name']} exited their {$exit['loc_name']} location for {$exit['fex_days']}minutes ago. Please take action.</p>
-	        </p>
-	        <p>Thank you for using $SHORTNAME.</p>
-	        <p>NOTE: please DO NOT REPLY to this email.</p>
-	        <p><br><strong>$SHORTNAME</strong></p>";
-			// $sm->sendmail(FROM_EMAIL, SHORTNAME, HELPDESK_EMAIL, $subject, $body);
-			// push to admin
-	        $push_to_admin = $os->notifyUser("admin", $exit['stf_id'], $subject);
-	        // notification
-	        $nh = new NotificationHandler();
-	        $noti_id = $nh->log('admin', $exit['stf_id'], $subject);
-        }
-        $response["message"] = "Found ".count($exits)." unsafe exit(s)";
-    } else {
-    	$lg->logToFile('unsafe-exits', "No unsafe exits found.");
-    	$response["message"] = "No unsafe exits found.";
-    }
+//     if($exits) {
+//     	$lg->logToFile('fence-exits', "Found ".count($exits)." fence exit(s)");
+//     	$os = new OneSignal();
+//     	$sm = new mySwiftMailer();
+//     	$nh = new NotificationHandler();
+//         foreach ($exits as $exit) {
+//         	// set req_state to Overdue
+//         	// if($exit['req_state'] != 'Overdue' && $req_state['req_days'] > 30) {
+//         	// 	$udpate_request = $db->updateInTable(
+// 		    //         "request", /*table*/
+// 		    //         [ 'req_state'=>'Overdue' ], /*columns*/
+// 		    //         [ 'req_id'=>$request['req_id'] ] /*where clause*/
+// 		    //     );
+//         	// }
+// 	        // notifications
+// 	        $SHORTNAME = SHORTNAME;
+// 	        // helpdesk
+// 	        $subject = "ALERT! Staff {$exit['stf_name']} has exited their location!";
+// 	        $body = "<p>Hello Admin,</p>
+// 	        <p>
+// 	        <p>Staff #{$exit['stf_name']} exited their {$exit['loc_name']} location for {$exit['fex_days']}minutes ago. Please take action.</p>
+// 	        </p>
+// 	        <p>Thank you for using $SHORTNAME.</p>
+// 	        <p>NOTE: please DO NOT REPLY to this email.</p>
+// 	        <p><br><strong>$SHORTNAME</strong></p>";
+// 			// $sm->sendmail(FROM_EMAIL, SHORTNAME, HELPDESK_EMAIL, $subject, $body);
+// 			// push to admin
+// 	        $push_to_admin = $os->notifyUser("admin", $exit['stf_id'], $subject);
+// 	        // notification
+// 	        $nh = new NotificationHandler();
+// 	        $noti_id = $nh->log('admin', $exit['stf_id'], $subject);
+//         }
+//         $response["message"] = "Found ".count($exits)." unsafe exit(s)";
+//     } else {
+//     	$lg->logToFile('unsafe-exits', "No unsafe exits found.");
+//     	$response["message"] = "No unsafe exits found.";
+//     }
 
-    $lg->logToFile('unsafe-exits', '--- END');
+//     $lg->logToFile('unsafe-exits', '--- END');
     
-    echoResponse(200, $response);
-});
+//     echoResponse(200, $response);
+// });
