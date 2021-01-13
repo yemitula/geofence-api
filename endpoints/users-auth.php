@@ -126,16 +126,14 @@ $app->post('/changePassword', function() use ($app) {
     verifyRequiredParams(array('user_id', 'current', 'new'),$r->password);
     $response = array();
     $db = new DbHandler();
-    $ss = new SessionHandlr();
-    $session = $ss->getSession('call2fix_user');
-    $call2fix_user = $session['call2fix_user'];
+    // $ss = new SessionHandlr();
+    // $session = $ss->getSession('call2fix_user');
+    // $call2fix_user = $session['call2fix_user'];
 
     $user_id = $db->purify($r->password->user_id);
     $current = $db->purify($r->password->current);
     $new = $db->purify($r->password->new);
 
-    // does id match logged in user?
-    if($user_id == $call2fix_user['user_id']) {
         // id matches logged in user
         // is current password correct?
         $user_password = $db->getOneRecord("SELECT user_id from user WHERE user_id='$user_id' AND user_password = '$current' ");
@@ -161,11 +159,7 @@ $app->post('/changePassword', function() use ($app) {
             $response['status'] = "error";
             $response['message'] = 'Current password supplied is incorrect!';
         }
-    } else {
-        // id doesn't match logged in user
-        $response['status'] = "error";
-        $response['message'] = 'Access Denied! Invalid user action';
-    }
+    
     echoResponse(200, $response);
 });
 
