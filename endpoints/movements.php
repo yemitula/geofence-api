@@ -7,10 +7,17 @@ $app->get('/movements', function() use ($app) {
     // database handler
     $db = new DbHandler();
     $mov_id = $db->purify($app->request->get('mov_id'));
+    $fex_id = $db->purify($app->request->get('fex_id'));
     // compose sql query
-    $query = "SELECT * FROM movement LEFT JOIN fence_exit ON mov_exit_id=fex_id LEFT JOIN staff ON fex_staff_id=stf_id WHERE 1=1";
+    $query = "SELECT * FROM movement 
+        LEFT JOIN fence_exit ON mov_exit_id=fex_id 
+        LEFT JOIN staff ON fex_staff_id=stf_id 
+        WHERE 1=1";
     if($mov_id!="" && $mov_id!="undefined") {
         $query .= " AND mov_id = '$mov_id'";
+    }
+    if($fex_id) {
+        $query .= " AND mov_exit_id = '$fex_id'";
     }
     // run query
     $movements = $db->getRecordset($query);
